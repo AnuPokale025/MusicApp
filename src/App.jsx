@@ -1,14 +1,24 @@
-import Footer from './components/Footer.jsx'
-import HeroSection from './components/HeroSection.jsx'
-import Navabar from './components/Navabar.jsx'
+import { Routes, Route } from 'react-router-dom'
+import HeroSection from "./pages/HeroSection"
+import Login from "./pages/Login"
+import Register from "./pages/Register"
+import MainLayout from './layouts/MainLayout'
+import Profile from './pages/Profile'
 
 function App() {
   return (
-    <>
-      <Navabar />
-      <HeroSection />
-      <Footer/>
-    </>
+    <Routes>
+      {/* Public routes - without layout */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* Protected routes - with Navbar and Footer */}
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<HeroSection />} />
+        <Route path="/home" element={<HeroSection />} />
+        <Route path="/profile" element={<Profile />} />
+      </Route>
+    </Routes>
   )
 }
 

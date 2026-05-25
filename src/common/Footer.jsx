@@ -110,7 +110,7 @@ export default function Footer() {
       <div className="border-b border-white/[0.08] bg-[#1a1a1a]">
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-4 px-6 py-6 sm:flex-row sm:items-center lg:px-12">
           <div>
-            <p className="text-base font-bold text-white">Preview of Spotify</p>
+            <p className="text-base font-bold text-white">Preview of MusicApp</p>
             <p className="text-sm text-[#b3b3b3]">
               Sign up to get unlimited songs and podcasts with occasional ads. No credit card needed.
             </p>

@@ -1,7 +1,11 @@
 import { useState } from 'react'
 import { Home, Search, LayoutGrid, ArrowUpRight, User, Plus } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import Register from '../pages/Register'
+import { useAuth } from '../context/Authcontext.jsx'
 
 function SpotifyLogo() {
+
   return (
     <svg width="28" height="28" viewBox="0 0 496 512" xmlns="http://www.w3.org/2000/svg">
       <path
@@ -36,7 +40,26 @@ function IconBtn({ children, className = '', ...props }) {
 }
 
 export default function Navbar() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const change = () => {
+    navigate('/login');
+  };
+  const homeBtn = ()=>{
+    navigate('/')
+  }
+  const ProfileBtn = () => {
+    navigate('/profile')
+  }
   const [focused, setFocused] = useState(false)
+
+  const handleLogout = () => {
+    logout();
+
+    navigate("/", {
+     
+    });
+  };
 
   return (
     <div className="bg-[#121212] font-sans">
@@ -46,7 +69,7 @@ export default function Navbar() {
 
         {/* Logo */}
         <a
-          href="#"
+          href="/"
           aria-label="Spotify Home"
           className="mr-2 flex items-center gap-2 no-underline"
         >
@@ -56,11 +79,12 @@ export default function Navbar() {
 
         {/* Home button */}
         <button
+        onClick={homeBtn}
           type="button"
           aria-label="Home"
           className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-[#1a1a1a] text-white transition hover:bg-[#2a2a2a]"
         >
-          <Home size={20} />
+          <Home  size={20} />
         </button>
 
         {/* Search bar */}
@@ -107,23 +131,41 @@ export default function Navbar() {
           </button>
 
           {/* Sign up */}
-          <button
-            type="button"
-            className="rounded-full bg-white px-8 py-3 text-sm font-bold text-black transition hover:bg-[#f0f0f0] hover:scale-[1.03] active:scale-100 whitespace-nowrap border-none cursor-pointer"
-          >
-            Sign up
-          </button>
+          {
+            user ? (
+              <button
+                onClick={() => {
+                  logout();
+                  navigate("/login");
+                }}
+                type="button"
+                className="rounded-full bg-red-500 px-8 py-3 text-sm font-bold text-white transition hover:bg-red-600 hover:scale-[1.03] active:scale-100 whitespace-nowrap border-none cursor-pointer"
+              >
+                Logout
+              </button>
+            ) : (
+              <button
+                onClick={change}
+                type="button"
+                className="rounded-full bg-white px-8 py-3 text-sm font-bold text-black transition hover:bg-[#f0f0f0] hover:scale-[1.03] active:scale-100 whitespace-nowrap border-none cursor-pointer"
+              >
+                Sign In
+              </button>
+            )
+          }
 
           {/* Avatar pill */}
           <button
             type="button"
+            onClick={ProfileBtn}
             aria-label="Anna's account"
             className="flex items-center gap-2 rounded-full bg-[#1a1a1a] py-1 pl-1 pr-3 transition hover:bg-[#2a2a2a] border-none cursor-pointer"
           >
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#333] text-white">
               <User size={16} />
             </span>
-            <span className="text-sm font-semibold text-white">Anna</span>
+            {/* <span className="text-sm font-semibold text-white">Anna</span> */}
+            <h4 className="text-lg">{user?.name}</h4>
           </button>
         </div>
       </header>
