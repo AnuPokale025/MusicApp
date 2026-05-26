@@ -16,10 +16,11 @@ function SpotifyLogo() {
   )
 }
 
-function FilterPill({ label }) {
+function FilterPill({ label, onClick }) {
   return (
     <button
       type="button"
+      onClick={onClick}
       className="rounded-full bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-white transition hover:bg-white/20 whitespace-nowrap"
     >
       {label}
@@ -45,7 +46,7 @@ export default function Navbar() {
   const change = () => {
     navigate('/login');
   };
-  const homeBtn = ()=>{
+  const homeBtn = () => {
     navigate('/')
   }
   const ProfileBtn = () => {
@@ -57,7 +58,7 @@ export default function Navbar() {
     logout();
 
     navigate("/", {
-     
+
     });
   };
 
@@ -79,12 +80,12 @@ export default function Navbar() {
 
         {/* Home button */}
         <button
-        onClick={homeBtn}
+          onClick={homeBtn}
           type="button"
           aria-label="Home"
           className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-[#1a1a1a] text-white transition hover:bg-[#2a2a2a]"
         >
-          <Home  size={20} />
+          <Home size={20} />
         </button>
 
         {/* Search bar */}
@@ -188,8 +189,28 @@ export default function Navbar() {
         <div className="mx-1 h-5 w-px bg-white/10" />
 
         {/* Filter pills */}
-        {['Playlists', 'Podcasts & Shows', 'Artists', 'Albums'].map(pill => (
-          <FilterPill key={pill} label={pill} />
+        {['Playlists', 'Songs', 'Artists', 'Albums'].map((pill) => (
+          <FilterPill
+            key={pill}
+            label={pill}
+            onClick={() => {
+              if (pill === "Songs") {
+                navigate("/songs");
+              }
+
+              if (pill === "Playlists") {
+                navigate("/playlist");
+              }
+
+              if (pill === "Artists") {
+                navigate("/#");
+              }
+
+              if (pill === "Albums") {
+                navigate("/#");
+              }
+            }}
+          />
         ))}
 
         {/* Spacer */}
