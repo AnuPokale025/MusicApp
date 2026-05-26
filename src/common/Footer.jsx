@@ -116,7 +116,7 @@ export default function Footer() {
             </p>
           </div>
           <a
-            href="#"
+            href="/register"
             className="flex-shrink-0 rounded-full border-2 border-white px-7 py-3 text-sm font-bold text-white transition hover:scale-105 hover:bg-white hover:text-black active:scale-95"
           >
             Sign up free
