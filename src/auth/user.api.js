@@ -17,7 +17,7 @@ const UserApi = {
     createplaylist: async (data, userId, songId) => {
         try {
             const res = await apiClient.post(
-                `/playlists/user/${userId}/${songId}`,
+                `/playlists/user/${userId}`,
                 data
             );
 

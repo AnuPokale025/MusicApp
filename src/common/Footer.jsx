@@ -107,7 +107,7 @@ export default function Footer() {
     <footer className="w-full bg-[#121212] text-white">
 
       {/* ── Premium CTA banner ── */}
-      <div className="border-b border-white/[0.08] bg-[#1a1a1a]">
+      <div className="border-b border-white/8 bg-[#1a1a1a]">
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-4 px-6 py-6 sm:flex-row sm:items-center lg:px-12">
           <div>
             <p className="text-base font-bold text-white">Preview of MusicApp</p>
@@ -117,7 +117,7 @@ export default function Footer() {
           </div>
           <a
             href="/register"
-            className="flex-shrink-0 rounded-full border-2 border-white px-7 py-3 text-sm font-bold text-white transition hover:scale-105 hover:bg-white hover:text-black active:scale-95"
+            className="shrink-0 rounded-full border-2 border-white px-7 py-3 text-sm font-bold text-white transition hover:scale-105 hover:bg-white hover:text-black active:scale-95"
           >
             Sign up free
           </a>
@@ -152,7 +152,7 @@ export default function Footer() {
         </div>
 
         {/* ── Divider ── */}
-        <div className="my-10 border-t border-white/[0.08]" />
+        <div className="my-10 border-t border-white/8" />
 
         {/* ── Bottom row ── */}
         <div className="flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">

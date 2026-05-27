@@ -71,7 +71,7 @@ const Register = () => {
     <div className="min-h-screen bg-black flex items-center justify-center px-4 py-10">
 
       {/* Background Glow */}
-      <div className="absolute w-[500px] h-[500px] bg-green-500/20 blur-3xl rounded-full"></div>
+      <div className="absolute w-125 h-500 bg-green-500/20 blur-3xl rounded-full"></div>
 
       {/* Register Card */}
       <div className="relative z-10 w-full max-w-md bg-[#121212] border border-zinc-800 rounded-2xl shadow-2xl p-8">
@@ -243,9 +243,9 @@ const Register = () => {
 
         {/* Divider */}
         <div className="flex items-center gap-3 my-6">
-          <div className="flex-1 h-[1px] bg-zinc-700"></div>
+          <div className="flex-1 h-1px bg-zinc-700"></div>
           <span className="text-zinc-400 text-sm">or</span>
-          <div className="flex-1 h-[1px] bg-zinc-700"></div>
+          <div className="flex-1 h-1px bg-zinc-700"></div>
         </div>
 
         {/* Google Button */}

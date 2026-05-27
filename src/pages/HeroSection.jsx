@@ -176,7 +176,7 @@ export default function HeroSection() {
     <section className="min-h-screen w-full overflow-hidden bg-[#121212]">
 
       {/* ── Hero banner ─────────────────────────────────────────── */}
-      <div className={`relative bg-gradient-to-b ${track.gradient} transition-all duration-700`}>
+      <div className={`relative bg-linear-to-b ${track.gradient} transition-all duration-700`}>
 
         {/* Noise texture overlay */}
         <div
@@ -210,7 +210,7 @@ export default function HeroSection() {
               </div>
 
               {/* Waveform visualiser (CSS animated bars) */}
-              <div className="flex items-end gap-[3px] h-10">
+              <div className="flex items-end gap-0.75 h-10">
                 {Array.from({ length: 28 }).map((_, i) => (
                   <div
                     key={i}
@@ -336,7 +336,7 @@ export default function HeroSection() {
                     alt={item.title}
                     className="h-44 w-full object-cover transition group-hover:brightness-75"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
                   <div className="absolute bottom-0 left-0 p-3">
                     <p className="text-sm font-bold text-white">{item.title}</p>
                     <p className="text-xs text-white/70">{item.artist}</p>

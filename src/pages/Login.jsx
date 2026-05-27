@@ -70,7 +70,7 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-4">
       {/* Background Glow */}
-      <div className="absolute w-[450px] h-[450px] bg-green-500/20 blur-3xl rounded-full"></div>
+      <div className="absolute w-112.5 h-112.5 bg-green-500/20 blur-3xl rounded-full"></div>
 
       {/* Login Card */}
       <div className="relative z-10 w-full max-w-md bg-[#121212] border border-zinc-800 rounded-2xl shadow-2xl p-8">
@@ -150,9 +150,9 @@ const Login = () => {
 
         {/* Divider */}
         <div className="flex items-center gap-3 my-6">
-          <div className="flex-1 h-[1px] bg-zinc-700"></div>
+          <div className="flex-1 h-px bg-zinc-700"></div>
           <span className="text-zinc-400 text-sm">or</span>
-          <div className="flex-1 h-[1px] bg-zinc-700"></div>
+          <div className="flex-1 h-px bg-zinc-700"></div>
         </div>
 
         {/* Google Login */}

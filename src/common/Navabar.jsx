@@ -66,7 +66,7 @@ export default function Navbar() {
     <div className="bg-[#121212] font-sans">
 
       {/* ── Top bar ── */}
-      <header className="flex h-16 items-center gap-2 border-b border-white/[0.08] bg-[#121212] px-4">
+      <header className="flex h-16 items-center gap-2 border-b border-white/8 bg-[#121212] px-4">
 
         {/* Logo */}
         <a
@@ -83,7 +83,7 @@ export default function Navbar() {
           onClick={homeBtn}
           type="button"
           aria-label="Home"
-          className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-[#1a1a1a] text-white transition hover:bg-[#2a2a2a]"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#1a1a1a] text-white transition hover:bg-[#2a2a2a]"
         >
           <Home size={20} />
         </button>
@@ -120,7 +120,7 @@ export default function Navbar() {
         <div className="flex-1" />
 
         {/* Right actions */}
-        <div className="flex flex-shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
 
           {/* Upgrade */}
           <button
@@ -174,7 +174,7 @@ export default function Navbar() {
       {/* ── Library / filter bar ── */}
       <nav
         aria-label="Your library"
-        className="flex items-center gap-1 border-b border-white/[0.08] bg-[#121212] px-3"
+        className="flex items-center gap-1 border-b border-white/8 bg-[#121212] px-3"
       >
         {/* Your Library tab */}
         <button
