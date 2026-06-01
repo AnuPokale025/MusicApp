@@ -2,7 +2,6 @@ import apiClient from "./api"
 
 const UserApi = {
 
-
     // ============get playlist=============
 
     getAllPlaylist: async () => {
