@@ -200,10 +200,7 @@ export default function HeroSection() {
 
               {/* Title */}
               <div>
-                <h1
-                  className="text-5xl font-black leading-none tracking-tighter text-white lg:text-7xl"
-                  style={{ fontFamily: "'Montserrat', sans-serif" }}
-                >
+                <h1 className="text-5xl font-black leading-none tracking-tighter text-white lg:text-7xl">
                   {track.title}
                 </h1>
                 <p className="mt-2 text-lg font-semibold text-white/60">{track.artist} · {track.album}</p>
@@ -214,12 +211,12 @@ export default function HeroSection() {
                 {Array.from({ length: 28 }).map((_, i) => (
                   <div
                     key={i}
-                    className="w-1 rounded-full"
+                    className={`w-1 rounded-full ${isPlaying ? 'animate-barBounce' : ''}`}
                     style={{
                       background: track.accent,
                       height: `${20 + Math.sin(i * 0.7) * 16 + Math.cos(i * 1.3) * 10}px`,
                       opacity: isPlaying ? 1 : 0.4,
-                      animation: isPlaying ? `bounce ${0.5 + (i % 5) * 0.15}s ease-in-out infinite alternate` : 'none',
+                      animationDuration: isPlaying ? `${0.5 + (i % 5) * 0.15}s` : undefined,
                     }}
                   />
                 ))}
@@ -264,14 +261,12 @@ export default function HeroSection() {
                   key={track.id}
                   src={track.cover}
                   alt={track.title}
-                  className="relative h-64 w-64 rounded-2xl object-cover shadow-2xl ring-1 ring-white/10 lg:h-72 lg:w-72"
-                  style={{ animation: 'fadeIn 0.5s ease' }}
+                  className="relative h-64 w-64 rounded-2xl object-cover shadow-2xl ring-1 ring-white/10 lg:h-72 lg:w-72 animate-fadeIn"
                 />
                 {/* Spinning disc badge */}
                 {isPlaying && (
                   <div
-                    className="absolute -bottom-4 -right-4 h-16 w-16 rounded-full bg-[#121212] p-1 shadow-xl ring-1 ring-white/10"
-                    style={{ animation: 'spin 4s linear infinite' }}
+                    className="absolute -bottom-4 -right-4 h-16 w-16 rounded-full bg-[#121212] p-1 shadow-xl ring-1 ring-white/10 animate-spinSlow"
                   >
                     <div className="h-full w-full rounded-full bg-[#1a1a1a] flex items-center justify-center">
                       <div className="h-3 w-3 rounded-full bg-[#1DB954]" />
@@ -298,7 +293,7 @@ export default function HeroSection() {
       {/* ── Genres ──────────────────────────────────────────────── */}
       <div className="mx-auto max-w-7xl px-6 py-10 lg:px-12">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-xl font-bold text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+          <h2 className="text-xl font-bold text-white">
             Browse by Genre
           </h2>
           <button className="flex items-center gap-1 text-sm font-semibold text-[#b3b3b3] transition hover:text-white">
@@ -317,7 +312,7 @@ export default function HeroSection() {
           {/* Featured cards */}
           <div className="lg:col-span-2">
             <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+              <h2 className="text-xl font-bold text-white">
                 Featured Albums
               </h2>
               <button className="flex items-center gap-1 text-sm font-semibold text-[#b3b3b3] transition hover:text-white">
@@ -357,7 +352,7 @@ export default function HeroSection() {
           {/* Trending */}
           <div>
             <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+              <h2 className="text-xl font-bold text-white">
                 Trending Now
               </h2>
               <button className="flex items-center gap-1 text-sm font-semibold text-[#b3b3b3] transition hover:text-white">
@@ -371,22 +366,6 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* ── Keyframe styles ─────────────────────────────────────── */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap');
-        @keyframes bounce {
-          from { transform: scaleY(0.5); }
-          to   { transform: scaleY(1.3); }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: scale(0.96); }
-          to   { opacity: 1; transform: scale(1); }
-        }
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to   { transform: rotate(360deg); }
-        }
-      `}</style>
     </section>
   )
 }

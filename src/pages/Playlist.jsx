@@ -7,10 +7,12 @@ import {
   Search,
   Heart,
 } from "lucide-react";
+import { useMusic } from "../context/MusicContext";
 
 import UserApi from "../auth/user.api";
 
 export default function PlaylistPage() {
+  const { playSong } = useMusic();
 
   const [playlists, setPlaylists] = useState([]);
   const [playlistName, setPlaylistName] = useState("");
@@ -359,8 +361,17 @@ export default function PlaylistPage() {
                     </p>
                   </div>
 
-                  <button className="bg-green-500 p-3 rounded-full hover:scale-105 transition">
-
+                  <button
+                    onClick={() =>
+                      playlist.songs?.[0] &&
+                      playSong({
+                        ...playlist.songs[0],
+                        audioUrl: playlist.songs[0].audio || playlist.songs[0].audioUrl,
+                        coverImage: playlist.songs[0].image || playlist.songs[0].coverImage || playlist.songs[0].cover,
+                      })
+                    }
+                    className="bg-green-500 p-3 rounded-full hover:scale-105 transition"
+                  >
                     <Play
                       size={18}
                       fill="white"
@@ -373,7 +384,7 @@ export default function PlaylistPage() {
                 <div className="mt-6 space-y-3">
 
                   {playlist.songs &&
-                  playlist.songs.length > 0 ? (
+                    playlist.songs.length > 0 ? (
 
                     playlist.songs.map(
                       (song, index) => (
@@ -400,10 +411,24 @@ export default function PlaylistPage() {
                             </div>
                           </div>
 
-                          <button className="text-zinc-400 hover:text-red-500 transition">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() =>
+                                playSong({
+                                  ...song,
+                                  audioUrl: song.audio || song.audioUrl,
+                                  coverImage: song.image || song.coverImage || song.cover,
+                                })
+                              }
+                              className="text-green-400 hover:text-green-300 transition"
+                            >
+                              <Play size={18} />
+                            </button>
 
-                            <Heart size={18} />
-                          </button>
+                            <button className="text-zinc-400 hover:text-red-500 transition">
+                              <Heart size={18} />
+                            </button>
+                          </div>
                         </div>
                       )
                     )

@@ -11,8 +11,12 @@ const Login = () => {
     password: "",
   });
   const { login } = useAuth();
+  
 
   const navigate = useNavigate();
+  const ForgetRoute = () => {
+      navigate("/forget");
+    }
 
   const change = () => {
     navigate("/register");
@@ -42,6 +46,7 @@ const Login = () => {
     };
 
     const res = await AuthApi.login(loginData);
+    
 
     console.log(res.data);
 
@@ -58,6 +63,8 @@ const Login = () => {
     // Navigate based on role
     if (findrole === "admin") {
       navigate("/", { replace: true });
+    } else if (findrole === "artist") {
+      navigate("/artists", { replace: true });
     } else {
       navigate("/", { replace: true });
     }
@@ -133,6 +140,7 @@ const Login = () => {
           <div className="flex justify-end">
             <button
               type="button"
+              onClick={ForgetRoute}
               className="text-sm text-green-500 hover:underline"
             >
               Forgot Password?

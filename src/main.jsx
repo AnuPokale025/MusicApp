@@ -4,12 +4,15 @@ import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './context/Authcontext.jsx'
+import { MusicProvider } from './context/MusicContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <App />
+        <MusicProvider>
+          <App />
+        </MusicProvider>
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>,

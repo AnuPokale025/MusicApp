@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import UserApi from "../auth/user.api";
-import { Music2, Calendar, User } from "lucide-react";
+import { Music2, Calendar, User, Play } from "lucide-react";
+import { useMusic } from "../context/MusicContext";
 
 const Song = () => {
   const [songs, setSongs] = useState([]);
+  const { playSong } = useMusic();
 
   useEffect(() => {
     const fetchSong = async () => {
@@ -16,7 +18,7 @@ const Song = () => {
 
         // Handle both array and object responses
         const songData = Array.isArray(res.data) ? res.data : res.songs || [];
-        setSongs(res.data);
+        setSongs(songData);
 
       } catch (err) {
         console.error("Song fetch error:", err);
@@ -25,6 +27,7 @@ const Song = () => {
 
     fetchSong();
   }, []);
+  
 
   return (
     <div className="min-h-screen bg-black px-6 py-10">
@@ -87,10 +90,19 @@ const Song = () => {
                 </p>
               </div>
 
-              {/* Audio Player */}
-              <audio controls className="w-full">
-                <source src={song.audio} type="audio/mp3" />
-              </audio>
+              <button
+                onClick={() =>
+                  playSong({
+                    ...song,
+                    audioUrl: song.audio || song.audioUrl,
+                    coverImage: song.image || song.coverImage || song.cover,
+                  })
+                }
+                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-green-500 px-4 py-3 text-sm font-semibold text-black transition hover:bg-green-400"
+              >
+                <Play size={18} />
+                Play Song
+              </button>
             </div>
           </div>
         ))}

@@ -81,6 +81,14 @@ const UserApi = {
             throw error.response?.data || error
         }
     },
+    searchSong : async(query)=>{
+        try{
+            const res = await apiClient.get(`/search?query=${query}`)
+            return res.data;
+        }catch(error){
+            throw error.response?.data || error
+        }
+    },
 
     //====================favorite====================
 

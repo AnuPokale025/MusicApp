@@ -1,20 +1,15 @@
-import { useState } from 'react'
-import { Home, Search, LayoutGrid, ArrowUpRight, User, Plus } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
-import Register from '../pages/Register'
-import { useAuth } from '../context/Authcontext.jsx'
-
-function SpotifyLogo() {
-
-  return (
-    <svg width="28" height="28" viewBox="0 0 496 512" xmlns="http://www.w3.org/2000/svg">
-      <path
-        fill="#1DB954"
-        d="M248 8C111.1 8 8 111.1 8 248s103.1 240 240 240 240-103.1 240-240S384.9 8 248 8zm110.7 348.2c-4.3 7-13.5 9.2-20.5 4.9-56.3-34.4-127.1-42.1-210.6-23-8.1 1.9-16.1-3.1-18-11.2-1.9-8.1 3-16.1 11.1-18 91.3-20.8 169.7-11.8 233.1 26.5 7 4.3 9.2 13.5 4.9 20.8zm29.5-65.7c-5.4 8.7-16.9 11.5-25.7 6.1-64.4-39.6-162.5-51-238.5-27.9-9.9 3-20.3-2.5-23.3-12.3-3-9.9 2.5-20.3 12.4-23.3 86.9-26.4 194.8-13.6 268.5 32.1 8.8 5.5 11.6 17 6.6 25.3zm2.5-68.1c-77-45.7-204-49.9-277.5-27.6-11.8 3.6-24.3-3.1-27.9-14.9-3.6-11.8 3-24.3 14.9-27.9 84.5-25.7 224.7-20.7 313.2 32 10.6 6.3 14.1 20 7.8 30.6-6.4 10.5-20.2 14.1-30.5 7.8z"
-      />
-    </svg>
-  )
-}
+import { useState } from "react";
+import {
+  Home,
+  Search,
+  LayoutGrid,
+  ArrowUpRight,
+  User,
+  Plus,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/Authcontext.jsx";
+import UserApi from "../auth/user.api.js";
 
 function FilterPill({ label, onClick }) {
   return (
@@ -25,10 +20,10 @@ function FilterPill({ label, onClick }) {
     >
       {label}
     </button>
-  )
+  );
 }
 
-function IconBtn({ children, className = '', ...props }) {
+function IconBtn({ children, className = "", ...props }) {
   return (
     <button
       type="button"
@@ -37,73 +32,106 @@ function IconBtn({ children, className = '', ...props }) {
     >
       {children}
     </button>
-  )
+  );
 }
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const change = () => {
-    navigate('/login');
-  };
+
+  const [query, setQuery] = useState("");
+  const [focused, setFocused] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+
   const homeBtn = () => {
-    navigate('/')
-  }
-  const ProfileBtn = () => {
-    navigate('/profile')
-  }
-  const [focused, setFocused] = useState(false)
+    navigate("/");
+  };
+
+  const profileBtn = () => {
+    navigate("/profile");
+  };
 
   const handleLogout = () => {
     logout();
+    navigate("/home");
+  };
 
-    navigate("/", {
+  const handleSearch = async () => {
+    try {
+      if (!query.trim()) return;
 
-    });
+      console.log("Searching:", query);
+
+      const res = await UserApi.searchSong(query);
+
+      console.log("API Response:", res.data);
+
+      setSearchResults(res?.data?.data || res?.data || []);
+      // console.log(setSearchResults);
+
+    } catch (error) {
+      console.error(
+        "Error searching songs:",
+        error?.response?.data || error.message
+      );
+    }
   };
 
   return (
     <div className="bg-[#121212] font-sans">
-
-      {/* ── Top bar ── */}
+      {/* Top Bar */}
       <header className="flex h-16 items-center gap-2 border-b border-white/8 bg-[#121212] px-4">
-
         {/* Logo */}
         <a
           href="/"
-          aria-label="Spotify Home"
+          aria-label="Music Home"
           className="mr-2 flex items-center gap-2 no-underline"
         >
-          {/* <SpotifyLogo /> */}
-          <span className="text-[15px] font-bold tracking-tight text-white">Music</span>
+          <span className="text-[15px] font-bold tracking-tight text-white">
+            Music
+          </span>
         </a>
 
-        {/* Home button */}
+        {/* Home Button */}
         <button
           onClick={homeBtn}
           type="button"
           aria-label="Home"
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#1a1a1a] text-white transition hover:bg-[#2a2a2a]"
+          className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-full bg-[#1a1a1a] text-white transition hover:bg-[#2a2a2a]"
         >
           <Home size={20} />
         </button>
 
-        {/* Search bar */}
-        <div className="relative ml-2 flex-1" style={{ maxWidth: 364 }}>
-          <Search
-            size={18}
-            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#a7a7a7]"
-          />
+        {/* Search Bar */}
+        <div className="relative ml-2 flex-1 max-w-full sm:max-w-[420px]">
+          <button
+            type="button"
+            onClick={handleSearch}
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#a7a7a7] hover:text-white"
+          >
+            <Search size={18} />
+          </button>
+
           <input
             type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearch();
+              }
+            }}
             placeholder="What do you want to play?"
             aria-label="Search"
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             className={`h-12 w-full rounded-full bg-[#242424] px-12 text-sm text-white placeholder-[#a7a7a7] outline-none transition
-              ${focused ? 'border border-white bg-[#2a2a2a]' : 'border border-transparent'}`}
+              ${focused
+                ? "border border-white bg-[#2a2a2a]"
+                : "border border-transparent"
+              }`}
           />
-          {/* Browse icon + divider */}
+
           <div className="absolute right-3.5 top-1/2 flex -translate-y-1/2 items-center gap-1.5">
             <div className="h-5 w-px bg-white/15" />
             <button
@@ -119,111 +147,104 @@ export default function Navbar() {
         {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Right actions */}
+        {/* Right Side */}
         <div className="flex shrink-0 items-center gap-2">
-
-          {/* Upgrade */}
           <button
             type="button"
-            className="inline-flex items-center gap-1.5 rounded-full px-4 py-1 text-sm font-semibold text-[#a7a7a7] transition hover:text-white whitespace-nowrap bg-transparent border-none cursor-pointer"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold text-[#a7a7a7] transition hover:text-white whitespace-nowrap"
           >
             <ArrowUpRight size={16} />
             Upgrade
           </button>
 
-          {/* Sign up */}
-          {
-            user ? (
-              <button
-                onClick={() => {
-                  logout();
-                  navigate("/login");
-                }}
-                type="button"
-                className="rounded-full bg-red-500 px-8 py-3 text-sm font-bold text-white transition hover:bg-red-600 hover:scale-[1.03] active:scale-100 whitespace-nowrap border-none cursor-pointer"
-              >
-                Logout
-              </button>
-            ) : (
-              <button
-                onClick={change}
-                type="button"
-                className="rounded-full bg-white px-8 py-3 text-sm font-bold text-black transition hover:bg-[#f0f0f0] hover:scale-[1.03] active:scale-100 whitespace-nowrap border-none cursor-pointer"
-              >
-                Sign In
-              </button>
-            )
-          }
+          {user ? (
+            <button
+              onClick={handleLogout}
+              type="button"
+              className="rounded-full bg-red-500 px-4 sm:px-8 py-2 sm:py-3 text-sm font-bold text-white transition hover:bg-red-600"
+            >
+              Logout
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate("/login")}
+              type="button"
+              className="rounded-full bg-white px-8 py-3 text-sm font-bold text-black transition hover:bg-[#f0f0f0]"
+            >
+              Sign In
+            </button>
+          )}
 
-          {/* Avatar pill */}
           <button
             type="button"
-            onClick={ProfileBtn}
-            aria-label="Anna's account"
-            className="flex items-center gap-2 rounded-full bg-[#1a1a1a] py-1 pl-1 pr-3 transition hover:bg-[#2a2a2a] border-none cursor-pointer"
+            onClick={profileBtn}
+            aria-label="Account"
+            className="flex items-center gap-2 rounded-full bg-[#1a1a1a] py-1 pl-1 pr-3 transition hover:bg-[#2a2a2a]"
           >
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#333] text-white">
               <User size={16} />
             </span>
-            {/* <span className="text-sm font-semibold text-white">Anna</span> */}
-            <h4 className="text-lg">{user?.name}</h4>
+            <h4 className="hidden sm:block text-lg">
+              {user?.name || "Guest"}
+            </h4>
           </button>
         </div>
       </header>
 
-      {/* ── Library / filter bar ── */}
+      {/* Library Navigation */}
       <nav
         aria-label="Your library"
-        className="flex items-center gap-1 border-b border-white/8 bg-[#121212] px-3"
+        className="flex items-center gap-1 border-b border-white/8 bg-[#121212] px-3 overflow-x-auto whitespace-nowrap"
       >
-        {/* Your Library tab */}
         <button
           type="button"
-          className="inline-flex items-center gap-1.5 border-b-2 border-[#1DB954] px-3.5 py-2.5 -mb-px text-sm font-medium text-white bg-transparent cursor-pointer rounded-none"
+          className="inline-flex items-center gap-1.5 border-b-2 border-[#1DB954] px-3.5 py-2.5 -mb-px text-sm font-medium text-white bg-transparent"
         >
           <LayoutGrid size={16} />
           Your Library
         </button>
 
-        {/* Divider */}
         <div className="mx-1 h-5 w-px bg-white/10" />
 
-        {/* Filter pills */}
-        {['Playlists', 'Songs', 'Artists', 'Albums'].map((pill) => (
+        {["Playlists", "Songs", "Artists", "Albums"].map((pill) => (
           <FilterPill
             key={pill}
             label={pill}
             onClick={() => {
-              if (pill === "Songs") {
-                navigate("/songs");
-              }
+              switch (pill) {
+                case "Songs":
+                  navigate("/songs");
+                  break;
 
-              if (pill === "Playlists") {
-                navigate("/playlist");
-              }
+                case "Playlists":
+                  navigate("/playlist");
+                  break;
 
-              if (pill === "Artists") {
-                navigate("/#");
-              }
+                case "Artists":
+                  navigate("/artists");
+                  break;
 
-              if (pill === "Albums") {
-                navigate("/#");
+                case "Albums":
+                  navigate("/albums");
+                  break;
+
+                default:
+                  break;
               }
             }}
           />
         ))}
 
-        {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Search + Create playlist */}
         <div className="flex items-center gap-1">
           <IconBtn aria-label="Search library">
             <Search size={18} />
           </IconBtn>
+
           <button
             type="button"
-            className="inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-[13px] font-semibold text-[#b3b3b3] transition hover:bg-white/[0.07] hover:text-white whitespace-nowrap bg-transparent border-none cursor-pointer"
+            className="inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-[13px] font-semibold text-[#b3b3b3] transition hover:bg-white/[0.07] hover:text-white"
           >
             <Plus size={16} />
             Create playlist
@@ -231,6 +252,64 @@ export default function Navbar() {
         </div>
       </nav>
 
+      {/* Search Results Debug */}
+      {searchResults.length > 0 && (
+        <div className="p-4 bg-[#181818]">
+          <h3 className="text-white font-semibold mb-2">
+            Search Results
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+            {searchResults.map((song, index) => (
+              <div
+                key={song._id || index}
+                className="bg-zinc-900 rounded-xl overflow-hidden shadow-lg hover:shadow-green-500/20 transition-all duration-300"
+              >
+                {/* Song Image */}
+                <div className="h-60 overflow-hidden">
+                  <img
+                    src={song.image}
+                    alt={song.title}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+
+                {/* Song Details */}
+                <div className="p-4">
+                  <h2 className="text-xl font-bold text-white truncate">
+                    {song.title}
+                  </h2>
+
+                  <p className="text-gray-400 mt-2">
+                    <span className="font-semibold text-gray-200">Artist:</span>{" "}
+                    {song.artist}
+                  </p>
+
+                  <p className="text-gray-400">
+                    <span className="font-semibold text-gray-200">Album:</span>{" "}
+                    {song.album}
+                  </p>
+
+                  <p className="text-gray-400">
+                    <span className="font-semibold text-gray-200">Release:</span>{" "}
+                    {song.releaseDate
+                      ? new Date(song.releaseDate).toLocaleDateString()
+                      : "N/A"}
+                  </p>
+
+                  {/* Audio Player */}
+                  <div className="mt-4">
+                    <audio controls className="w-full">
+                      <source src={song.audio} type="audio/mpeg" />
+                      Your browser does not support the audio element.
+                    </audio>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
-  )
+  );
 }

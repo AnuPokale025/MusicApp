@@ -1,9 +1,9 @@
 // Footer.jsx — Spotify-style footer with React + Tailwind CSS
 
 const LINKS = {
-  Company: ['About', 'Jobs', 'For the Record'],
+  Company: ['Home','About'],
   Communities: ['For Artists', 'Developers', 'Advertising', 'Investors', 'Vendors'],
-  'Useful Links': ['Support', 'Free Mobile App', 'Premium Plans', 'Gift Cards'],
+  'Useful Links': ['Support', 'Free Mobile App'],
 }
 
 const LEGAL = [
@@ -139,9 +139,9 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-3">
               <SocialBtn icon={<IconInstagram />} label="Instagram" />
-              <SocialBtn icon={<IconTwitter />}   label="Twitter / X" />
-              <SocialBtn icon={<IconFacebook />}  label="Facebook" />
-              <SocialBtn icon={<IconYoutube />}   label="YouTube" />
+              <SocialBtn icon={<IconTwitter />} label="Twitter / X" />
+              <SocialBtn icon={<IconFacebook />} label="Facebook" />
+              <SocialBtn icon={<IconYoutube />} label="YouTube" />
             </div>
           </div>
 
