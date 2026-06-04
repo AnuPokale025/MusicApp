@@ -15,9 +15,11 @@ import MusicModal from './model/MusicModel'
 import Library from './pages/Library'
 
 
+
 function App() {
   const { user } = useAuth()
   const isArtist = user?.role?.toLowerCase() === 'artist'
+ 
 
   return (
     <>

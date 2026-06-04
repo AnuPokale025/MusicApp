@@ -5,15 +5,18 @@ import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './context/Authcontext.jsx'
 import { MusicProvider } from './context/MusicContext.jsx'
+import { SocketProvider } from './context/SocketContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <MusicProvider>
-          <App />
-        </MusicProvider>
+        <SocketProvider>
+          <MusicProvider>
+            <App />
+          </MusicProvider>
+        </SocketProvider>
       </AuthProvider>
     </BrowserRouter>
-  </React.StrictMode>,
+  </React.StrictMode >,
 )

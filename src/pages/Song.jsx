@@ -2,10 +2,29 @@ import React, { useEffect, useState } from "react";
 import UserApi from "../auth/user.api";
 import { Music2, Calendar, User, Play, Heart } from "lucide-react";
 import { useMusic } from "../context/MusicContext";
+import { useAuth } from "../context/Authcontext";
+import socket from "./socket";
 
 const Song = () => {
   const [songs, setSongs] = useState([]);
+  const [favorites, setFavorites] = useState([]);
   const { playSong } = useMusic();
+  const { user } = useAuth();
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log("Connected:", socket.id);
+    });
+
+    socket.on("newfavoriteSong", (data) => {
+      console.log("New Favorite Song:", data);
+
+      setFavorites((prev) => [...prev, data]);
+    });
+
+    return () => {
+      socket.off("newfavoriteSong");
+    };
+  }, []);
 
   useEffect(() => {
     const fetchSong = async () => {
@@ -32,26 +51,67 @@ const Song = () => {
     const fetchFavoriteSongs = async () => {
       try {
         const res = await UserApi.getAllFavoriteSong();
-        console.log("Favorite Songs:", res.data);
+        const favoriteData = Array.isArray(res.data)
+          ? res.data
+          : res.data?.songs || res.songs || [];
+        console.log("Favorite Songs:", favoriteData);
+        setFavorites(favoriteData);
       } catch (err) {
         console.error("Favorite Songs fetch error:", err);
       }
-    }
-    fetchFavoriteSongs();
+    };
 
+    fetchFavoriteSongs();
   }, []);
 
+  const getFavoriteMap = () => {
+    return favorites.reduce((map, fav) => {
+      const songId = fav?.songId?._id || fav?.songId;
+      if (songId) {
+        map[songId] = fav;
+      }
+      return map;
+    }, {});
+  };
+
+  const favoriteMap = getFavoriteMap();
+  const isFavorite = (songId) => Boolean(favoriteMap[songId]);
+
   const addToFavorite = async (songId) => {
+    const userId = user?._id;
+
+    if (!userId) {
+      return alert("Please log in to add favorites.");
+    }
+
     try {
-      const res = await UserApi.addFavoriteSong(songId);
-      console.log("Added to favorites:", res.data);
-      setFavorites((prev) => [...prev, res.data]); // Assuming res.data contains the new favorite song
-      // Optionally, you can update the local state to reflect the change immediately
+      const res = await UserApi.addFavoriteSong(songId, userId);
+      console.log("Added to favorites:", res);
+      setFavorites((prev) => [...prev, res]);
     } catch (err) {
       console.error("Error adding to favorites:", err);
     }
-  }
+  };
 
+  const removeFavorite = async (favoriteId) => {
+    try {
+      await UserApi.removeFavoriteSong(favoriteId);
+      setFavorites((prev) => prev.filter((fav) => fav._id !== favoriteId));
+    } catch (err) {
+      console.error("Error removing favorite:", err);
+    }
+  };
+
+  const toggleFavorite = async (song) => {
+    const songId = song?._id;
+    const favorite = favoriteMap[songId];
+
+    if (favorite) {
+      await removeFavorite(favorite._id);
+    } else {
+      await addToFavorite(songId);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black px-6 py-10">
@@ -128,10 +188,14 @@ const Song = () => {
                 Play Song
               </button>
               <button
-                onClick={() => addToFavorite(song._id)}
+                onClick={() => toggleFavorite(song)}
                 className="p-3 rounded-full bg-zinc-800 text-white hover:bg-red-500 transition"
               >
-                <Heart size={20} />
+                <Heart
+                  size={20}
+                  fill={isFavorite(song._id) ? "red" : "none"}
+                  className={isFavorite(song._id) ? "text-red-500" : "text-white"}
+                />
               </button>
             </div>
           </div>

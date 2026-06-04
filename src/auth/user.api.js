@@ -101,19 +101,14 @@ const UserApi = {
         }
     },
 
-    addFavoriteSong: async (data, userId, playlistId, songId) => {
-        try {
-            const res = await apiClient.post(`/favorites/${userId}/${playlistId}/${songId}`, data);
-            return res.data;
-            {
-                header: {bearer: Cookies.get('token')}
-            }
-
-        } catch (error) {
+    addFavoriteSong: async(songId, userId)=>{
+        try{
+            const res = await apiClient.post(`/favorites/${userId}/${songId}`);
+            return res.data
+        }catch(error){
             throw error.response?.data || error
         }
     },
-
     removeFavoriteSong: async (favoriteId) => {
         try {
             const res = await apiClient.delete(`/favorites/${favoriteId}`);
