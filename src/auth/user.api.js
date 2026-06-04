@@ -81,11 +81,11 @@ const UserApi = {
             throw error.response?.data || error
         }
     },
-    searchSong : async(query)=>{
-        try{
+    searchSong: async (query) => {
+        try {
             const res = await apiClient.get(`/search?query=${query}`)
             return res.data;
-        }catch(error){
+        } catch (error) {
             throw error.response?.data || error
         }
     },
@@ -105,6 +105,10 @@ const UserApi = {
         try {
             const res = await apiClient.post(`/favorites/${userId}/${playlistId}/${songId}`, data);
             return res.data;
+            {
+                header: {bearer: Cookies.get('token')}
+            }
+
         } catch (error) {
             throw error.response?.data || error
         }
@@ -112,11 +116,41 @@ const UserApi = {
 
     removeFavoriteSong: async (favoriteId) => {
         try {
-            const res = await apiClient.delete(`/favorite/${favoriteId}`);
+            const res = await apiClient.delete(`/favorites/${favoriteId}`);
             return res.data
+            
         } catch (error) {
             throw error.response?.data || error
         }
+    },
+
+    //====================Artist====================
+    getAllArtist: async () => {
+        try {
+            const res = await apiClient.get('/artists')
+            return res.data;
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    AddArtist: async (data, adminId) => {
+        try {
+            const res = await apiClient.post(`/artists/${adminId}`);
+            return res.data;
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    getArtistById: async (artistId) => {
+        try {
+            const res = await apiClient.get(`/artists/${artistId}`);
+            return res.data;
+        } catch (error) {
+            throw error.response?.data || error
+        }
+
     }
 }
 

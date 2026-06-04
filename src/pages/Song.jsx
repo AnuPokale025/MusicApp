@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import UserApi from "../auth/user.api";
-import { Music2, Calendar, User, Play } from "lucide-react";
+import { Music2, Calendar, User, Play, Heart } from "lucide-react";
 import { useMusic } from "../context/MusicContext";
 
 const Song = () => {
@@ -27,17 +27,41 @@ const Song = () => {
 
     fetchSong();
   }, []);
-  
+
+  useEffect(() => {
+    const fetchFavoriteSongs = async () => {
+      try {
+        const res = await UserApi.getAllFavoriteSong();
+        console.log("Favorite Songs:", res.data);
+      } catch (err) {
+        console.error("Favorite Songs fetch error:", err);
+      }
+    }
+    fetchFavoriteSongs();
+
+  }, []);
+
+  const addToFavorite = async (songId) => {
+    try {
+      const res = await UserApi.addFavoriteSong(songId);
+      console.log("Added to favorites:", res.data);
+      setFavorites((prev) => [...prev, res.data]); // Assuming res.data contains the new favorite song
+      // Optionally, you can update the local state to reflect the change immediately
+    } catch (err) {
+      console.error("Error adding to favorites:", err);
+    }
+  }
+
 
   return (
     <div className="min-h-screen bg-black px-6 py-10">
-      
+
       {/* Heading */}
       <div className="mb-10">
         <h1 className="text-4xl font-bold text-white">
           Songs
         </h1>
-        
+
 
         <p className="text-zinc-400 mt-2">
           Explore all music tracks
@@ -46,13 +70,13 @@ const Song = () => {
 
       {/* Songs Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        
+
         {songs.map((song, index) => (
           <div
             key={index}
             className="bg-zinc-900 rounded-3xl overflow-hidden border border-zinc-800 hover:bg-zinc-800 transition-all duration-300 shadow-xl"
           >
-            
+
             {/* Song Image */}
             <div className="w-full h-60 overflow-hidden">
               <img
@@ -64,7 +88,7 @@ const Song = () => {
 
             {/* Song Details */}
             <div className="p-5">
-              
+
               {/* Title */}
               <div className="flex items-center gap-2 mb-3">
                 <Music2 size={18} className="text-green-500" />
@@ -102,6 +126,12 @@ const Song = () => {
               >
                 <Play size={18} />
                 Play Song
+              </button>
+              <button
+                onClick={() => addToFavorite(song._id)}
+                className="p-3 rounded-full bg-zinc-800 text-white hover:bg-red-500 transition"
+              >
+                <Heart size={20} />
               </button>
             </div>
           </div>

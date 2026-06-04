@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Play, Pause, SkipForward, SkipBack, Volume2, Shuffle, Repeat, ChevronRight, Heart } from 'lucide-react'
+import UserApi from '../auth/user.api'
+import { useMusic } from '../context/MusicContext'
 
 // ── Data ────────────────────────────────────────────────────────────────────
 
@@ -72,25 +74,63 @@ function GenreChip({ label, color, emoji }) {
 
 function TrendingRow({ rank, title, artist, plays, cover }) {
   const [liked, setLiked] = useState(false)
+  const [songs, setSongs] = useState([]);
+  const { playSong } = useMusic()
+
+  useEffect(() => {
+    const fetchSong = async () => {
+      try {
+        const res = await UserApi.getAllSongs();
+        const songData = Array.isArray(res.data) ? res.data : res.songs || [];
+        setSongs(songData);
+        console.log("Songs:", songData);
+      } catch (err) {
+        console.error("Song fetch error:", err);
+      }
+
+    };
+    fetchSong();
+  }, []);
+
   return (
-    <div className="group flex items-center gap-3 rounded-lg px-3 py-2 transition hover:bg-white/5">
-      <span className="w-4 text-center text-xs font-bold text-[#b3b3b3] group-hover:hidden">{rank}</span>
-      <Play size={14} className="hidden text-white group-hover:block" />
-      <img src={cover} alt={title} className="h-10 w-10 rounded object-cover" />
-      <div className="flex-1 min-w-0">
-        <p className="truncate text-sm font-semibold text-white">{title}</p>
-        <p className="truncate text-xs text-[#b3b3b3]">{artist}</p>
-      </div>
-      <button
-        onClick={() => setLiked(l => !l)}
-        className="hidden text-[#b3b3b3] transition hover:text-white group-hover:block"
-      >
-        <Heart size={14} className={liked ? 'fill-[#1DB954] text-[#1DB954]' : ''} />
-      </button>
-      <span className="text-xs text-[#b3b3b3]">{plays}</span>
+    <div className="grid grid-rows-2  gap-4">
+      {songs.map((song) => (
+        <div
+          key={song._id}
+          className="bg-gray-800 rounded-lg p-4 hover:bg-gray-700"
+        >
+          <img
+            src={song.image}
+            alt={song.title}
+            className="w-full h-40 object-cover rounded-md"
+          />
+
+          <h3 className="text-white font-semibold mt-2">
+            {song.title}
+          </h3>
+
+          <p className="text-gray-400 text-sm">
+            {song.artist}
+          </p>
+            <button
+                onClick={() =>
+                  playSong({
+                    ...song,
+                    audioUrl: song.audio || song.audioUrl,
+                    coverImage: song.image || song.coverImage || song.cover,
+                  })
+                }
+                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-green-500 px-4 py-3 text-sm font-semibold text-black transition hover:bg-green-400"
+              >
+                <Play size={18} />
+                Play Song
+              </button>
+        </div>
+      ))}
     </div>
-  )
-}
+  );
+};
+  
 
 function MiniPlayer({ track, isPlaying, onToggle, progress, onProgress }) {
   return (
@@ -360,7 +400,7 @@ export default function HeroSection() {
               </button>
             </div>
             <div className="rounded-2xl bg-[#1a1a1a] py-2">
-              {TRENDING.map(t => <TrendingRow key={t.rank} {...t} />)}
+               <TrendingRow />
             </div>
           </div>
         </div>

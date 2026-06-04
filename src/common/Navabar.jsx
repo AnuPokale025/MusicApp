@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Home,
   Search,
@@ -37,6 +37,7 @@ function IconBtn({ children, className = "", ...props }) {
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const [favoriteSongs, setFavoriteSongs] = useState([]);
   const navigate = useNavigate();
 
   const [query, setQuery] = useState("");
@@ -76,6 +77,20 @@ export default function Navbar() {
       );
     }
   };
+ 
+
+    const fetchfavoritesongs = async () => {
+      try {
+        const res = await UserApi.getAllFavoriteSong();
+        console.log("Favorite Songs:", res.data);
+        setFavoriteSongs(res.data);
+      } catch (err) {
+        console.error("Favorite Songs fetch error:", err);
+
+      }
+    }
+
+
 
   return (
     <div className="bg-[#121212] font-sans">
@@ -197,6 +212,7 @@ export default function Navbar() {
         className="flex items-center gap-1 border-b border-white/8 bg-[#121212] px-3 overflow-x-auto whitespace-nowrap"
       >
         <button
+        onClick={() => navigate("/favorites")}
           type="button"
           className="inline-flex items-center gap-1.5 border-b-2 border-[#1DB954] px-3.5 py-2.5 -mb-px text-sm font-medium text-white bg-transparent"
         >
@@ -225,7 +241,7 @@ export default function Navbar() {
                   break;
 
                 case "Albums":
-                  navigate("/albums");
+                  navigate("/#");
                   break;
 
                 default:

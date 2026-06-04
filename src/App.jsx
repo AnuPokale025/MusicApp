@@ -12,6 +12,7 @@ import ForgetPassword from './pages/ForgetPassword'
 import ResetPassword from './pages/ResetPassword'
 import Artist from './pages/Artist'
 import MusicModal from './model/MusicModel'
+import Library from './pages/Library'
 
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
           <Route path="/home" element={<HeroSection />} />
           <Route path="/playlist" element={<PlaylistPage />} />
           <Route path="/songs" element={<Song />} />
+          <Route path="/favorites" element={<Library />} />
         </Route>
 
         {/* Artist protected routes */}

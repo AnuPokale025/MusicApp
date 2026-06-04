@@ -4,21 +4,21 @@ import { Play } from "lucide-react";
 import { useMusic } from "../context/MusicContext";
 
 const Artist = () => {
-  const [songs, setSongs] = useState([]);
+  const [artists, setArtists] = useState([]);
   const { playSong } = useMusic();
 
   useEffect(() => {
     const fetchArtist = async () => {
       try {
-        const res = await UserApi.getAllSongs();
+        const res = await UserApi.getAllArtist();
 
-        const songData = Array.isArray(res.data)
+        const artistData = Array.isArray(res.data)
           ? res.data
-          : res.data?.songs || [];
+          : res.data?.artists || [];
 
-        setSongs(songData);
+        setArtists(artistData);
 
-        console.log("Songs:", songData);
+        console.log("Artists:", artistData);
       } catch (err) {
         console.error("Artist fetch error:", err);
       }
@@ -31,27 +31,27 @@ const Artist = () => {
     <div className="p-5">
       <h1 className="text-3xl font-bold mb-4">Artists</h1>
 
-      {songs.length === 0 ? (
-        <p>No songs found.</p>
+      {artists.length === 0 ? (
+        <p>No artists found.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {songs.map((song) => (
+          {artists.map((artist) => (
             <div
-              key={song._id}
+              key={artist._id}
               className="bg-gray-900 rounded-lg overflow-hidden shadow-lg"
             >
               <div className="w-full h-60 overflow-hidden">
                 <img
-                  src={song.image}
-                  alt={song.title}
+                  src={artist.image}
+                  alt={artist.name}
                   className="w-full h-full object-cover hover:scale-105 transition-all duration-500"
                 />
               </div>
 
               <div className="p-4">
-                <h2 className="text-xl font-semibold">{song.artist}</h2>
-                <p className="text-gray-400">{song.title}</p>
-                <p className="text-sm text-gray-500">{song.album}</p>
+                <h2 className="text-xl font-semibold">{artist.name}</h2>
+                <p className="text-gray-400">{artist.genre}</p>
+                <p className="text-sm text-gray-500">{artist.country}</p>
 
                 <button
                   onClick={() =>
