@@ -6,7 +6,7 @@ import { useMusic } from "../context/MusicContext";
 const Library = () => {
     const [favorites, setFavorites] = useState([]);
     const [loading, setLoading] = useState(true);
-    const {playSong} = useMusic();  
+    const { playSong } = useMusic();
 
     useEffect(() => {
         const fetchFavoriteSongs = async () => {
@@ -59,6 +59,9 @@ const Library = () => {
             <p className="text-zinc-400 mb-8">
                 Your favorite songs collection
             </p>
+            <br />
+
+
 
             {favorites.length === 0 ? (
                 <div className="flex flex-col items-center justify-center mt-20">

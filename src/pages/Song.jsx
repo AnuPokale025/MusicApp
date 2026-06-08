@@ -3,7 +3,7 @@ import UserApi from "../auth/user.api";
 import { Music2, Calendar, User, Play, Heart } from "lucide-react";
 import { useMusic } from "../context/MusicContext";
 import { useAuth } from "../context/Authcontext";
-import socket from "./socket";
+import socket from "../utils/socket";
 
 const Song = () => {
   const [songs, setSongs] = useState([]);

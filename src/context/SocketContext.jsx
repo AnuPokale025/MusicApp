@@ -1,6 +1,6 @@
 // context/SocketContext.jsx
 import { createContext, useContext } from "react";
-import socket from "../pages/socket";
+import socket from "../utils/socket";
 
 const SocketContext = createContext();
 

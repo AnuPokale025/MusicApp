@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Play, Pause, SkipForward, SkipBack, Volume2, Shuffle, Repeat, ChevronRight, Heart } from 'lucide-react'
 import UserApi from '../auth/user.api'
 import { useMusic } from '../context/MusicContext'
+import { useAuth } from '../context/Authcontext'
 
 // ── Data ────────────────────────────────────────────────────────────────────
 
@@ -196,6 +198,8 @@ export default function HeroSection() {
   const [progress, setProgress] = useState(36)
 
   const track = FEATURED[activeIdx]
+  const navigate = useNavigate()
+  const { user } = useAuth()
 
   // Simulate progress
   useEffect(() => {
@@ -265,7 +269,10 @@ export default function HeroSection() {
               {/* CTA buttons */}
               <div className="flex flex-wrap items-center gap-3">
                 <button
-                  onClick={() => setIsPlaying(p => !p)}
+                  onClick={() => {
+                    if (!user) return navigate('/login')
+                    setIsPlaying(p => !p)
+                  }}
                   className="inline-flex items-center gap-2 rounded-full bg-[#1DB954] px-8 py-3.5 text-sm font-bold text-black shadow-lg transition hover:scale-105 hover:bg-[#1ed760] active:scale-95"
                 >
                   {isPlaying ? <Pause size={18} /> : <Play size={18} />}

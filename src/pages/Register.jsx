@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Music2,
   Mail,
+  Plus, 
   Lock,
   User,
   Phone,
@@ -18,11 +19,13 @@ const Register = () => {
     username: "",
     phone: "",
     role: "",
-    password: ""
+    password: "",
+    image: "",
   });
+  const [image, setImage] = useState(null);
   const [error, setError] = useState("");
-  const change =()=>{
-    navigate ('/login')
+  const change = () => {
+    navigate('/login')
   }
 
   const handleSubmit = async (e) => {
@@ -36,7 +39,9 @@ const Register = () => {
         username: formData.username,
         phone: formData.phone,
         role: formData.role,
-        password: formData.password
+        password: formData.password,
+        image: formData.image
+
       };
 
       const res = await AuthApi.signup(registerData);
@@ -54,7 +59,7 @@ const Register = () => {
     } catch (err) {
       setError(
         err?.message ||
-          "Registration failed"
+        "Registration failed"
       );
     }
   };
@@ -231,6 +236,50 @@ const Register = () => {
               />
             </div>
           </div>
+          <label className="bg-zinc-800 border-2 border-dashed border-zinc-700 hover:border-green-500 transition rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer min-h-[180px]">
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) =>
+                setImage(e.target.files[0])
+              }
+              className="hidden"
+            />
+
+            {image ? (
+
+              <div className="text-center">
+
+                <img
+                  src={URL.createObjectURL(image)}
+                  alt="preview"
+                  className="w-32 h-32 object-cover rounded-xl mx-auto mb-4"
+                />
+
+                <p className="text-zinc-300">
+                  {image.name}
+                </p>
+              </div>
+
+            ) : (
+
+              <>
+                <Plus
+                  size={36}
+                  className="text-green-500 mb-3"
+                />
+
+                <p className="text-zinc-300 font-medium">
+                  Upload Playlist Image
+                </p>
+
+                <p className="text-zinc-500 text-sm mt-1">
+                  Click to browse image
+                </p>
+              </>
+            )}
+          </label>
 
           {/* Register Button */}
           <button

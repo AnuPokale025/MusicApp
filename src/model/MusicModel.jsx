@@ -32,6 +32,8 @@ const MusicModal = () => {
   if (!isModalOpen || !currentSong) return null;
 
   const togglePlay = () => {
+    if (!audioRef.current) return;
+
     if (audioRef.current.paused) {
       audioRef.current.play();
     } else {
@@ -48,22 +50,34 @@ const MusicModal = () => {
         <X size={20} />
       </button>
 
-      <div className="flex gap-3 items-center">
+      <div className="flex items-center gap-3">
         <img
-          src={currentSong.coverImage || currentSong.image || currentSong.cover}
+          src={
+            currentSong.coverImage ||
+            currentSong.image ||
+            currentSong.cover
+          }
           alt={currentSong.title || currentSong.name}
           className="w-16 h-16 rounded-lg object-cover"
         />
 
         <div className="flex-1">
-          <h3 className="font-semibold">{currentSong.title || currentSong.name}</h3>
+          <h3 className="font-semibold">
+            {currentSong.title || currentSong.name}
+          </h3>
+
           <p className="text-sm text-gray-400">
-            {currentSong.artist || currentSong.performer || currentSong.author}
+            {currentSong.artist ||
+              currentSong.performer ||
+              currentSong.author}
           </p>
         </div>
 
-        <button onClick={togglePlay}>
-          {isPlaying ? <Pause size={28} /> : <Play size={28} />}
+        <button
+          onClick={togglePlay}
+          className="p-2 rounded-full bg-green-500 hover:bg-green-600"
+        >
+          {isPlaying ? <Pause size={24} /> : <Play size={24} />}
         </button>
       </div>
     </div>

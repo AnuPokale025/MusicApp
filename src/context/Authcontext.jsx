@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
     Cookies.remove("token");
     Cookies.remove("user");
 
-    // setUser(null);
+    setUser(null);
   };
 
   return (
