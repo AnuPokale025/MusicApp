@@ -6,9 +6,11 @@ import {
   ArrowUpRight,
   User,
   Plus,
+  Play,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/Authcontext.jsx";
+import { useMusic } from "../context/MusicContext.jsx";
 import UserApi from "../auth/user.api.js";
 
 function FilterPill({ label, onClick }) {
@@ -37,6 +39,7 @@ function IconBtn({ children, className = "", ...props }) {
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const { playSong } = useMusic();
   const [favoriteSongs, setFavoriteSongs] = useState([]);
   const navigate = useNavigate();
 
@@ -55,6 +58,24 @@ export default function Navbar() {
   const handleLogout = () => {
     logout();
     navigate("/home");
+  };
+
+  const handleSearchResultClick = (song) => {
+    if (!user) {
+      alert("Please sign in to play songs.");
+      navigate("/login");
+      return;
+    }
+
+    // Play the song
+    playSong({
+      ...song,
+      audioUrl: song.audio || song.audioUrl,
+      coverImage: song.image || song.coverImage || song.cover,
+    });
+    // Clear search results
+    setSearchResults([]);
+    setQuery("");
   };
 
   const handleSearch = async () => {
@@ -222,7 +243,7 @@ export default function Navbar() {
 
         <div className="mx-1 h-5 w-px bg-white/10" />
 
-        {["Playlists", "Songs", "Artists", "Albums"].map((pill) => (
+        {["Playlists", "Songs", "Artists"].map((pill) => (
           <FilterPill
             key={pill}
             label={pill}
@@ -240,9 +261,9 @@ export default function Navbar() {
                   navigate("/artists");
                   break;
 
-                case "Albums":
-                  navigate("/#");
-                  break;
+                // case "Albums":
+                //   navigate("/#");
+                //   break;
 
                 default:
                   break;
@@ -279,15 +300,22 @@ export default function Navbar() {
             {searchResults.map((song, index) => (
               <div
                 key={song._id || index}
-                className="bg-zinc-900 rounded-xl overflow-hidden shadow-lg hover:shadow-green-500/20 transition-all duration-300"
+                onClick={() => handleSearchResultClick(song)}
+                className="bg-zinc-900 rounded-xl overflow-hidden shadow-lg hover:shadow-green-500/20 transition-all duration-300 cursor-pointer hover:bg-zinc-800 transform hover:scale-105"
               >
                 {/* Song Image */}
-                <div className="h-60 overflow-hidden">
+                <div className="h-60 overflow-hidden relative">
                   <img
                     src={song.image}
                     alt={song.title}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                   />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity">
+                    <Play
+                      size={48}
+                      className="text-green-500 fill-green-500"
+                    />
+                  </div>
                 </div>
 
                 {/* Song Details */}
@@ -312,14 +340,6 @@ export default function Navbar() {
                       ? new Date(song.releaseDate).toLocaleDateString()
                       : "N/A"}
                   </p>
-
-                  {/* Audio Player */}
-                  <div className="mt-4">
-                    <audio controls className="w-full">
-                      <source src={song.audio} type="audio/mpeg" />
-                      Your browser does not support the audio element.
-                    </audio>
-                  </div>
                 </div>
               </div>
             ))}

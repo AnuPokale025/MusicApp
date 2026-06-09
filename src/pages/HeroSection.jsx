@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Play, Pause, SkipForward, SkipBack, Volume2, Shuffle, Repeat, ChevronRight, Heart } from 'lucide-react'
 import UserApi from '../auth/user.api'
 import { useMusic } from '../context/MusicContext'
-import { useAuth } from '../context/Authcontext'
 
 // ── Data ────────────────────────────────────────────────────────────────────
 
@@ -74,65 +72,75 @@ function GenreChip({ label, color, emoji }) {
   )
 }
 
-function TrendingRow({ rank, title, artist, plays, cover }) {
-  const [liked, setLiked] = useState(false)
+function TrendingRow() {
   const [songs, setSongs] = useState([]);
-  const { playSong } = useMusic()
+  const { playSong } = useMusic();
 
   useEffect(() => {
     const fetchSong = async () => {
       try {
         const res = await UserApi.getAllSongs();
-        const songData = Array.isArray(res.data) ? res.data : res.songs || [];
+        const songData = Array.isArray(res.data)
+          ? res.data
+          : res.data?.songs || [];
+
         setSongs(songData);
-        console.log("Songs:", songData);
       } catch (err) {
         console.error("Song fetch error:", err);
       }
-
     };
+
     fetchSong();
   }, []);
 
   return (
-    <div className="grid grid-rows-2  gap-4">
-      {songs.map((song) => (
+    <div className="space-y-4 p-4">
+      {songs.slice(0, 5).map((song, index) => (
         <div
           key={song._id}
-          className="bg-gray-800 rounded-lg p-4 hover:bg-gray-700"
+          className="flex items-center gap-4 rounded-xl bg-[#242424] p-3 hover:bg-[#2a2a2a] transition"
         >
+          <div className="w-8 text-center text-zinc-400 font-bold">
+            {index + 1}
+          </div>
+
           <img
             src={song.image}
             alt={song.title}
-            className="w-full h-40 object-cover rounded-md"
+            className="h-16 w-16 rounded-lg object-cover"
           />
 
-          <h3 className="text-white font-semibold mt-2">
-            {song.title}
-          </h3>
+          <div className="flex-1 min-w-0">
+            <h3 className="truncate text-white font-semibold">
+              {song.title}
+            </h3>
 
-          <p className="text-gray-400 text-sm">
-            {song.artist}
-          </p>
-            <button
-                onClick={() =>
-                  playSong({
-                    ...song,
-                    audioUrl: song.audio || song.audioUrl,
-                    coverImage: song.image || song.coverImage || song.cover,
-                  })
-                }
-                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-green-500 px-4 py-3 text-sm font-semibold text-black transition hover:bg-green-400"
-              >
-                <Play size={18} />
-                Play Song
-              </button>
+            <p className="truncate text-sm text-zinc-400">
+              {song.artist}
+            </p>
+          </div>
+
+          <button
+            onClick={() =>
+              playSong({
+                ...song,
+                audioUrl: song.audio || song.audioUrl,
+                coverImage:
+                  song.image ||
+                  song.coverImage ||
+                  song.cover,
+              })
+            }
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1DB954] text-black hover:scale-105 transition"
+          >
+            <Play size={18} />
+          </button>
         </div>
       ))}
     </div>
   );
-};
-  
+}
+
 
 function MiniPlayer({ track, isPlaying, onToggle, progress, onProgress }) {
   return (
@@ -198,8 +206,6 @@ export default function HeroSection() {
   const [progress, setProgress] = useState(36)
 
   const track = FEATURED[activeIdx]
-  const navigate = useNavigate()
-  const { user } = useAuth()
 
   // Simulate progress
   useEffect(() => {
@@ -231,11 +237,11 @@ export default function HeroSection() {
           }}
         />
 
-        <div className="relative z-10 mx-auto max-w-7xl px-6 py-16 lg:px-12">
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16 items-center">
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-12 py-10 lg:py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[70vh]">
 
             {/* Left — text + controls */}
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col justify-center gap-6">
               {/* Badge */}
               <span className="inline-flex w-fit items-center gap-2 rounded-full bg-[#1DB954]/20 px-3 py-1 text-xs font-bold text-[#1DB954] ring-1 ring-[#1DB954]/30">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#1DB954]" />
@@ -269,10 +275,7 @@ export default function HeroSection() {
               {/* CTA buttons */}
               <div className="flex flex-wrap items-center gap-3">
                 <button
-                  onClick={() => {
-                    if (!user) return navigate('/login')
-                    setIsPlaying(p => !p)
-                  }}
+                  onClick={() => setIsPlaying(p => !p)}
                   className="inline-flex items-center gap-2 rounded-full bg-[#1DB954] px-8 py-3.5 text-sm font-bold text-black shadow-lg transition hover:scale-105 hover:bg-[#1ed760] active:scale-95"
                 >
                   {isPlaying ? <Pause size={18} /> : <Play size={18} />}
@@ -308,7 +311,7 @@ export default function HeroSection() {
                   key={track.id}
                   src={track.cover}
                   alt={track.title}
-                  className="relative h-64 w-64 rounded-2xl object-cover shadow-2xl ring-1 ring-white/10 lg:h-72 lg:w-72 animate-fadeIn"
+                  className="relative h-56 w-56 sm:h-64 sm:w-64 lg:h-80 lg:w-80 rounded-3xl object-cover shadow-2xl ring-1 ring-white/10 animate-fadeIn"
                 />
                 {/* Spinning disc badge */}
                 {isPlaying && (
@@ -323,7 +326,7 @@ export default function HeroSection() {
               </div>
 
               {/* Mini player */}
-              <div className="w-full max-w-xs">
+              <div className="w-full max-w-sm">
                 <MiniPlayer
                   track={track}
                   isPlaying={isPlaying}
@@ -406,8 +409,8 @@ export default function HeroSection() {
                 All <ChevronRight size={16} />
               </button>
             </div>
-            <div className="rounded-2xl bg-[#1a1a1a] py-2">
-               <TrendingRow />
+            <div className="rounded-2xl bg-[#1a1a1a] overflow-hidden">
+              <TrendingRow />
             </div>
           </div>
         </div>
