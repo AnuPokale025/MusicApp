@@ -34,7 +34,7 @@ const AuthApi = {
     //============== Reset Password =============//
     resetPassword : async(data)=>{
         try{
-            const res = await apiClent.post('/reset-password', data);
+            const res = await apiClent.post('/reset', data);
             return res.data;
         }catch(error){  
             throw error.response.data;

@@ -7,6 +7,7 @@ const MusicModal = () => {
     currentSong,
     isModalOpen,
     setIsModalOpen,
+    pauseSong,
     audioRef,
   } = useMusic();
 
@@ -44,7 +45,10 @@ const MusicModal = () => {
   return (
     <div className="fixed bottom-5 right-5 w-80 bg-zinc-900 text-white rounded-xl shadow-2xl p-4 z-50">
       <button
-        onClick={() => setIsModalOpen(false)}
+        onClick={() => {
+          pauseSong();
+          setIsModalOpen(false);
+        }}
         className="absolute top-2 right-2"
       >
         <X size={20} />

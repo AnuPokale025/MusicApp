@@ -74,6 +74,7 @@ const Profile = () => {
                         {/* Avatar */}
                         <div className="h-40 w-40 rounded-full bg-white/20 backdrop-blur-lg border-4 border-white/20 flex items-center justify-center shadow-xl">
                             <User size={70} className="text-white" />
+                            {/* {user.image} */}
                         </div>
 
                         {/* User Info */}

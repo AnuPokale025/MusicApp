@@ -1,4 +1,6 @@
+import api from "./api";
 import apiClient from "./api"
+import Cookies from "js-cookie";
 
 const UserApi = {
 
@@ -13,18 +15,26 @@ const UserApi = {
         }
     },
 
-    createplaylist: async (data, userId, songId) => {
-        try {
-            const res = await apiClient.post(
-                `/playlists/user/${userId}`,
-                data
-            );
+   createplaylist: async (data, songId , userId) => {
 
-            return res.data;
-        } catch (error) {
-            throw error.response?.data || error;
-        }
-    },
+    try {
+        const token = Cookies.get("token");
+
+        const res = await apiClient.post(
+            `/playlists/${userId}/${songId}`,
+            data,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+
+        return res.data;
+    } catch (error) {
+        throw error.response?.data || error;
+    }
+},
 
     getplaylistById: async (playlistId) => {
         try {
@@ -101,11 +111,11 @@ const UserApi = {
         }
     },
 
-    addFavoriteSong: async(songId, userId)=>{
-        try{
+    addFavoriteSong: async (songId, userId) => {
+        try {
             const res = await apiClient.post(`/favorites/${userId}/${songId}`);
             return res.data
-        }catch(error){
+        } catch (error) {
             throw error.response?.data || error
         }
     },
@@ -113,7 +123,7 @@ const UserApi = {
         try {
             const res = await apiClient.delete(`/favorites/${favoriteId}`);
             return res.data
-            
+
         } catch (error) {
             throw error.response?.data || error
         }
@@ -146,7 +156,39 @@ const UserApi = {
             throw error.response?.data || error
         }
 
+    },
+
+    //=========watchingHistory==========
+    getHistory: async (userId) => {
+        try {
+
+            const res = await apiClient.get(`/history/${userId}`);
+            return res.data;
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    addHistory: async (userId, songId) => {
+        try {
+            const res = await apiClient.post(`/history/${userId}/${songId}`)
+            return res.data;
+
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    deleteHistory: async (userId) => {
+        try {
+            const res = await apiClient.delete(`/history/${userId}`);
+            return res.data;
+
+        } catch (error) {
+            throw error.response?.data || error
+        }
     }
+
 }
 
 export default UserApi;

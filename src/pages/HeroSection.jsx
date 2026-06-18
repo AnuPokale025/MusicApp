@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Play, Pause, SkipForward, SkipBack, Volume2, Shuffle, Repeat, ChevronRight, Heart } from 'lucide-react'
 import UserApi from '../auth/user.api'
 import { useMusic } from '../context/MusicContext'
+import { useNavigate } from 'react-router-dom'
 
 // ── Data ────────────────────────────────────────────────────────────────────
 
@@ -204,6 +205,7 @@ export default function HeroSection() {
   const [activeIdx, setActiveIdx] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [progress, setProgress] = useState(36)
+  const navigate = useNavigate();
 
   const track = FEATURED[activeIdx]
 
@@ -221,6 +223,10 @@ export default function HeroSection() {
     }, 5000)
     return () => clearInterval(t)
   }, [])
+  const AllSong =()=>{
+    navigate('/songs')
+  }
+
 
   return (
     <section className="min-h-screen w-full overflow-hidden bg-[#121212]">
@@ -405,7 +411,7 @@ export default function HeroSection() {
               <h2 className="text-xl font-bold text-white">
                 Trending Now
               </h2>
-              <button className="flex items-center gap-1 text-sm font-semibold text-[#b3b3b3] transition hover:text-white">
+              <button onClick={AllSong}  className="flex items-center gap-1 text-sm font-semibold text-[#b3b3b3] transition hover:text-white">
                 All <ChevronRight size={16} />
               </button>
             </div>

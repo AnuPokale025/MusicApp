@@ -50,6 +50,9 @@ export default function Navbar() {
   const homeBtn = () => {
     navigate("/");
   };
+  const playlistData =()=>{
+    navigate('/playlist')
+  }
 
   const profileBtn = () => {
     navigate("/profile");
@@ -243,7 +246,7 @@ export default function Navbar() {
 
         <div className="mx-1 h-5 w-px bg-white/10" />
 
-        {["Playlists", "Songs", "Artists"].map((pill) => (
+        {["Playlists", "Songs", "Artists", "Watching History"].map((pill) => (
           <FilterPill
             key={pill}
             label={pill}
@@ -261,9 +264,9 @@ export default function Navbar() {
                   navigate("/artists");
                   break;
 
-                // case "Albums":
-                //   navigate("/#");
-                //   break;
+                case "Watching History":
+                  navigate("/history");
+                  break;
 
                 default:
                   break;
@@ -275,12 +278,11 @@ export default function Navbar() {
         <div className="flex-1" />
 
         <div className="flex items-center gap-1">
-          <IconBtn aria-label="Search library">
-            <Search size={18} />
-          </IconBtn>
+          {/* <IconBs */}
 
           <button
             type="button"
+            onClick={playlistData}
             className="inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-[13px] font-semibold text-[#b3b3b3] transition hover:bg-white/[0.07] hover:text-white"
           >
             <Plus size={16} />

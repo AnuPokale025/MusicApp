@@ -8,18 +8,55 @@ import {
   Heart,
 } from "lucide-react";
 import { useMusic } from "../context/MusicContext";
-
+import PlaylistModal from "../model/PlaylistModal";
+import { useAuth } from "../context/Authcontext";
 import UserApi from "../auth/user.api";
 
 export default function PlaylistPage() {
   const { playSong } = useMusic();
+  const { user } = useAuth();
 
   const [playlists, setPlaylists] = useState([]);
+  const [availableSongs, setAvailableSongs] = useState([]);
+  const [selectedSongs, setSelectedSongs] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [playlistName, setPlaylistName] = useState("");
-  const [userId, setUserId] = useState("");
-  const [songId, setSongId] = useState("");
-  const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const normalizeSong = (song) => {
+    if (!song) return null;
+    if (typeof song === "string" || typeof song === "number") {
+      return {
+        _id: song,
+        id: song,
+        title: "Unknown Song",
+        artist: "",
+      };
+    }
+
+    const track = song.songId || song.songs || song;
+    const id = track._id || track.id || song._id || song.id || song?.songId?._id || song?.songId?.id;
+
+    return {
+      ...track,
+      _id: id,
+      id,
+      title: track.title || track.name || "Unknown Song",
+      artist: track.artist || "Unknown Artist",
+      audioUrl: track.audioUrl || track.audio || track.src,
+      image: track.image || track.coverImage || track.cover,
+    };
+  };
+
+  const getPlaylistArray = (response) => {
+    if (!response) return [];
+    if (Array.isArray(response)) return response;
+    if (Array.isArray(response.data)) return response.data;
+    if (Array.isArray(response.playlist)) return response.playlist;
+    if (Array.isArray(response.playlists)) return response.playlists;
+    if (Array.isArray(response.data?.data)) return response.data.data;
+    return [];
+  };
 
   // ================= GET PLAYLISTS =================
 
@@ -30,9 +67,16 @@ export default function PlaylistPage() {
 
       const res = await UserApi.getAllPlaylist();
 
-      const playlistData = Array.isArray(res.playlist)
-        ? res.playlist
-        : (res.playlists || []);
+      let playlistData = getPlaylistArray(res);
+
+      playlistData = playlistData.map((playlist) => ({
+        ...playlist,
+        songs: Array.isArray(playlist.songs)
+          ? playlist.songs
+              .map(normalizeSong)
+              .filter(Boolean)
+          : [],
+      }));
 
       setPlaylists(playlistData);
 
@@ -53,53 +97,59 @@ export default function PlaylistPage() {
 
   useEffect(() => {
     fetchPlaylists();
+    fetchSongs();
   }, []);
+
+  const openSongModal = () => setIsModalOpen(true);
+  const closeSongModal = () => setIsModalOpen(false);
+
+  const handleSongSelect = (song) => {
+    const normalizedSong = normalizeSong(song);
+    if (!normalizedSong) return;
+
+    const id = normalizedSong._id || normalizedSong.id;
+    if (!id) return;
+
+    if (selectedSongs.some((item) => item._id === id || item.id === id)) {
+      return;
+    }
+
+    setSelectedSongs((prev) => [...prev, normalizedSong]);
+  };
+
+  const removeSelectedSong = (songId) => {
+    setSelectedSongs((prev) => prev.filter((item) => item._id !== songId && item.id !== songId));
+  };
 
   // ================= CREATE PLAYLIST =================
 
-  const createPlaylist = async () => {
-
+  const createPlaylist = async (songId) => {
+    const userId = user?._id;
     try {
-
-      if (!playlistName || !image) {
-        return alert(
-          "Playlist name and image are required"
-        );
+      if (!playlistName.trim()) {
+        return alert("Playlist name is required");
       }
 
-      const formData = new FormData();
+      const playlistData = {
+        name: playlistName,
+        songs: selectedSongs.map((song) => song._id || song.id),
+      };
 
-      formData.append("name", playlistName);
-      formData.append("image", image);
+      const res = await UserApi.createplaylist(playlistData, userId);
 
-      if (songId) {
-        formData.append(
-          "songs",
-          JSON.stringify([songId])
-        );
-      }
-
-      await UserApi.createplaylist(
-        formData,
-        userId,
-        songId
-      );
-
+      console.log(res.data);
+      
       alert("Playlist created successfully");
 
       setPlaylistName("");
-      setUserId("");
-      setSongId("");
-      setImage(null);
-
+      setSelectedSongs([]);
       fetchPlaylists();
-
     } catch (error) {
-
       console.log(error);
-
       alert(
-        error.message || "Failed to create playlist"
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to create playlist"
       );
     }
   };
@@ -126,8 +176,23 @@ export default function PlaylistPage() {
     }
   };
 
+
+  const fetchSongs = async () => {
+    try {
+      const res = await UserApi.getAllSongs();
+      const songData = Array.isArray(res.data)
+        ? res.data
+        : res.data?.song || [];
+
+      setAvailableSongs(songData);
+    } catch (err) {
+      console.error("internal server error", err);
+    }
+  };
+
+
   return (
-    <div className="min-h-screen bg-black text-white flex">
+    <div className="min-h-screen bg-black text-white flex flex-col md:flex-row">
 
       {/* Sidebar */}
 
@@ -167,15 +232,6 @@ export default function PlaylistPage() {
                 className="bg-zinc-800 hover:bg-zinc-700 transition p-4 rounded-xl cursor-pointer flex items-center gap-4"
               >
 
-                <div className="w-14 h-14 overflow-hidden rounded-lg">
-
-                  <img
-                    src={playlist.image}
-                    alt={playlist.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
                 <div>
 
                   <h3 className="font-semibold">
@@ -183,7 +239,7 @@ export default function PlaylistPage() {
                   </h3>
 
                   <p className="text-sm text-zinc-400">
-                    {playlist.songs?.length || 0} songs
+                    {Array.isArray(playlist.songs) ? playlist.songs.length : 0} songs
                   </p>
                 </div>
               </div>
@@ -211,7 +267,7 @@ export default function PlaylistPage() {
             </p>
           </div>
 
-          <div className="flex items-center bg-zinc-900 px-4 py-2 rounded-xl w-full md:w-80">
+          <div className="flex items-center bg-zinc-900 border border-zinc-800 px-4 py-3 rounded-xl w-full md:w-96">
 
             <Search
               size={18}
@@ -228,7 +284,7 @@ export default function PlaylistPage() {
 
         {/* Create Playlist */}
 
-        <div className="bg-zinc-900 rounded-2xl p-6 mb-8 border border-zinc-800">
+        <div className="bg-zinc-900 rounded-2xl p-6 mb-8 border border-zinc-800 max-w-4xl">
 
           <h2 className="text-2xl font-semibold mb-6">
             Create New Playlist
@@ -248,73 +304,62 @@ export default function PlaylistPage() {
               className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 outline-none focus:border-green-500"
             />
 
-            {/* Song ID */}
 
-            {/* <input
-              type="text"
-              placeholder="Song ID"
-              value={songId}
-              onChange={(e) =>
-                setSongId(e.target.value)
-              }
-              className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 outline-none focus:border-green-500"
-            /> */}
           </div>
 
-          {/* Upload Image */}
-          
 
-          <label className="bg-zinc-800 border-2 border-dashed border-zinc-700 hover:border-green-500 transition rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer min-h-[180px]">
 
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) =>
-                setImage(e.target.files[0])
-              }
-              className="hidden"
-            />
+          <div className="flex flex-wrap gap-4 mt-6">
+            <button
+              onClick={openSongModal}
+              className="bg-blue-500 hover:bg-blue-600 px-5 py-2 rounded-xl font-medium"
+            >
+              Add Songs
+            </button>
 
-            {image ? (
+            <button
+              onClick={createPlaylist}
+              className="bg-green-500 hover:bg-green-600 px-5 py-2 rounded-xl font-medium"
+            >
+              Create Playlist
+            </button>
+          </div>
 
-              <div className="text-center">
-
-                <img
-                  src={URL.createObjectURL(image)}
-                  alt="preview"
-                  className="w-32 h-32 object-cover rounded-xl mx-auto mb-4"
-                />
-
-                <p className="text-zinc-300">
-                  {image.name}
-                </p>
+          {selectedSongs.length > 0 && (
+            <div className="mt-6 rounded-2xl border border-zinc-700 bg-zinc-950 p-4">
+              <h3 className="text-sm text-zinc-400 mb-3">
+                Selected songs ({selectedSongs.length})
+              </h3>
+              <div className="grid gap-3 md:grid-cols-2">
+                {selectedSongs.map((song) => (
+                  <div
+                    key={song._id || song.id}
+                    className="flex items-center justify-between rounded-xl bg-zinc-900 p-3"
+                  >
+                    <div>
+                      <p className="font-medium">{song.title || song.songId?.title || song.songs?.title}</p>
+                      <p className="text-sm text-zinc-500">
+                        {song.artist || song.songId?.artist || song.songs?.artist}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => removeSelectedSong(song._id || song.id)}
+                      className="text-sm text-red-400 hover:text-red-300"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
               </div>
+            </div>
+          )}
 
-            ) : (
-
-              <>
-                <Plus
-                  size={36}
-                  className="text-green-500 mb-3"
-                />
-
-                <p className="text-zinc-300 font-medium">
-                  Upload Playlist Image
-                </p>
-
-                <p className="text-zinc-500 text-sm mt-1">
-                  Click to browse image
-                </p>
-              </>
-            )}
-          </label>
-
-          <button
+          {/* <button
             onClick={createPlaylist}
             className="mt-6 bg-green-500 hover:bg-green-600 transition px-6 py-3 rounded-xl font-semibold"
           >
             Create Playlist
-          </button>
+          </button> */}
         </div>
 
         {/* Playlist Cards */}
@@ -327,25 +372,14 @@ export default function PlaylistPage() {
 
         ) : (
 
-          <div className="grid lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
 
             {playlists.map((playlist) => (
 
               <div
                 key={playlist._id}
-                className="bg-gradient-to-br from-zinc-900 to-zinc-800 p-6 rounded-3xl border border-zinc-800 shadow-lg"
+                className="bg-gradient-to-br from-zinc-900 to-zinc-800 p-6 rounded-3xl border border-zinc-800 shadow-lg flex flex-col h-full"
               >
-
-                {/* Image */}
-
-                <div className="w-full h-64 overflow-hidden rounded-2xl mb-4">
-
-                  <img
-                    src={playlist.image}
-                    alt={playlist.name}
-                    className="w-full h-full object-cover hover:scale-105 transition-all duration-500"
-                  />
-                </div>
 
                 {/* Header */}
 
@@ -358,7 +392,7 @@ export default function PlaylistPage() {
                     </h2>
 
                     <p className="text-zinc-400 text-sm mt-1">
-                      {playlist.songs?.length || 0} Songs
+                      {Array.isArray(playlist.songs) ? playlist.songs.length : 0} Songs
                     </p>
                   </div>
 
@@ -384,7 +418,7 @@ export default function PlaylistPage() {
 
                 <div className="mt-6 space-y-3">
 
-                  {playlist.songs &&
+                  {Array.isArray(playlist.songs) &&
                     playlist.songs.length > 0 ? (
 
                     playlist.songs.map(
@@ -392,7 +426,7 @@ export default function PlaylistPage() {
 
                         <div
                           key={index}
-                          className="flex items-center justify-between bg-zinc-800 px-4 py-3 rounded-xl"
+                          className="flex flex-wrap md:flex-nowrap items-center justify-between gap-3 bg-zinc-800 px-4 py-3 rounded-xl"
                         >
 
                           <div className="flex items-center gap-3">
@@ -404,10 +438,10 @@ export default function PlaylistPage() {
 
                             <div>
 
-                              <p>{song.title}</p>
+                              <p>{song.title || song.songId?.title || song.songs?.title}</p>
 
                               <p className="text-sm text-zinc-400">
-                                {song.artist}
+                                {song.artist || song.songId?.artist || song.songs?.artist}
                               </p>
                             </div>
                           </div>
@@ -444,7 +478,7 @@ export default function PlaylistPage() {
 
                 {/* Footer */}
 
-                <div className="flex items-center justify-between mt-6">
+                <div className="flex items-center justify-between mt-auto pt-6">
 
                   <button
                     onClick={() =>
@@ -463,6 +497,13 @@ export default function PlaylistPage() {
           </div>
         )}
       </div>
+      <PlaylistModal
+        isOpen={isModalOpen}
+        songs={availableSongs}
+        selectedSongIds={selectedSongs.map((song) => song._id || song.id)}
+        onClose={closeSongModal}
+        onSongAdd={handleSongSelect}
+      />
     </div>
   );
 }

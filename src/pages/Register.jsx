@@ -236,7 +236,7 @@ const Register = () => {
               />
             </div>
           </div>
-          <label className="bg-zinc-800 border-2 border-dashed border-zinc-700 hover:border-green-500 transition rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer min-h-[180px]">
+          {/* <label className="bg-zinc-800 border-2 border-dashed border-zinc-700 hover:border-green-500 transition rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer min-h-[180px]">
 
             <input
               type="file"
@@ -279,7 +279,7 @@ const Register = () => {
                 </p>
               </>
             )}
-          </label>
+          </label> */}
 
           {/* Register Button */}
           <button

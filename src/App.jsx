@@ -13,6 +13,7 @@ import ResetPassword from './pages/ResetPassword'
 import Artist from './pages/Artist'
 import MusicModal from './model/MusicModel'
 import Library from './pages/Library'
+import WatchHistory from './pages/WatchHistory'
 
 
 
@@ -37,6 +38,7 @@ function App() {
           <Route path="/playlist" element={<PlaylistPage />} />
           <Route path="/songs" element={<Song />} />
           <Route path="/favorites" element={<Library />} />
+          <Route path="/history" element={ <WatchHistory/>} />
         </Route>
 
         {/* Artist protected routes */}
